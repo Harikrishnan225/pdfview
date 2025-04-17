@@ -1,23 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
+import {RootStackParamList} from '../types/navigationTypes';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 interface pdfStoredDataType {
   title: string;
   pdfUrl: string;
   id: string;
 }
+
 const PdfList = () => {
   const [pdfStoredData, setPdfStoredData] = useState<pdfStoredDataType[]>([]);
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackParamList, 'PdfList'>>();
 
   useEffect(() => {
     pdfDataStored();
@@ -28,6 +25,8 @@ const PdfList = () => {
       const data = await AsyncStorage.getItem('pdfData');
       if (data) {
         const parsedData = JSON.parse(data);
+        console.log('datafromstorage', parsedData);
+
         setPdfStoredData(parsedData);
       }
     } catch (error) {
@@ -35,9 +34,11 @@ const PdfList = () => {
     }
   };
 
-  // const viewBtnPress = (pdfUrl: string){
-  //   navigation.navigate('PdfView', {pdfUrl})
-  // }
+  const viewBtnPress = (pdfUrl: string) => {
+    console.log('list', pdfUrl);
+
+    navigation.navigate('PdfView', {pdfUrl});
+  };
 
   return (
     <>
@@ -50,12 +51,16 @@ const PdfList = () => {
             <Text style={styles.itemText}>
               {index + 1}. {item.title}
             </Text>
-            {/* onPress={() => viewBtnPress(item.pdfUrl)} */}
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('Button pressed for pdfUrl:', item.pdfUrl); // Log the url
+                viewBtnPress(item.pdfUrl);
+              }}>
               <Text style={styles.viewButton}>View</Text>
             </TouchableOpacity>
           </View>
         )}
+        style={styles.container}
       />
     </>
   );
@@ -66,10 +71,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     fontWeight: 'bold',
-    marginVertical: 15,
+    backgroundColor: 'lightblue',
   },
   container: {
     flex: 1,
+    backgroundColor: 'lightblue',
   },
   tableContainer: {
     flexDirection: 'row',
@@ -77,7 +83,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 10,
     marginBottom: 4,
-    backgroundColor: 'black',
+    marginTop: 10,
+    backgroundColor: '#0080FF',
     borderRadius: 5,
     width: '90%',
     marginHorizontal: 'auto',
@@ -89,7 +96,7 @@ const styles = StyleSheet.create({
   },
   viewButton: {
     color: 'white',
-    backgroundColor: 'gray',
+    backgroundColor: 'lightblue',
     borderRadius: 4,
     padding: 10,
     width: 70,
