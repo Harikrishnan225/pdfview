@@ -35,8 +35,6 @@ const PdfList = () => {
   };
 
   const viewBtnPress = (pdfUrl: string) => {
-    console.log('list', pdfUrl);
-
     navigation.navigate('PdfView', {pdfUrl});
   };
 
@@ -53,7 +51,6 @@ const PdfList = () => {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                console.log('Button pressed for pdfUrl:', item.pdfUrl); // Log the url
                 viewBtnPress(item.pdfUrl);
               }}>
               <Text style={styles.viewButton}>View</Text>
