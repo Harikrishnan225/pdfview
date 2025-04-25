@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../types/navigationTypes';
 import {StackNavigationProp} from '@react-navigation/stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface pdfStoredDataType {
   title: string;
@@ -13,6 +14,8 @@ interface pdfStoredDataType {
 
 const PdfList = () => {
   const [pdfStoredData, setPdfStoredData] = useState<pdfStoredDataType[]>([]);
+  const [isDownloaded, setIsDownloaded] = useState(false);
+
   const navigation =
     useNavigation<StackNavigationProp<RootStackParamList, 'PdfList'>>();
 
@@ -23,19 +26,26 @@ const PdfList = () => {
   const pdfDataStored = async () => {
     try {
       const data = await AsyncStorage.getItem('pdfData');
+      const storedPdfData = await AsyncStorage.getItem('DownloadedPdfData');
+
       if (data) {
         const parsedData = JSON.parse(data);
-        console.log('datafromstorage', parsedData);
+        console.log('Parsed Data from AsyncStorage:', parsedData);
+        console.log('Logged Data', storedPdfData);
 
-        setPdfStoredData(parsedData);
+        if (Array.isArray(parsedData)) {
+          setPdfStoredData(parsedData);
+        }
+      } else {
+        console.log('No PDF data found in AsyncStorage.');
       }
     } catch (error) {
-      console.log(error);
+      console.log('Error retrieving data from AsyncStorage:', error);
     }
   };
 
-  const viewBtnPress = (pdfUrl: string) => {
-    navigation.navigate('PdfView', {pdfUrl});
+  const viewBtnPress = (pdfUrl: string, title: string, id: string) => {
+    navigation.navigate('PdfView', {pdfUrl, title, id});
   };
 
   return (
@@ -51,9 +61,12 @@ const PdfList = () => {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                viewBtnPress(item.pdfUrl);
+                viewBtnPress(item.pdfUrl, item.title, item.id);
               }}>
               <Text style={styles.viewButton}>View</Text>
+              <Text>
+                <Ionicons name="download" size={20} color="#000" />
+              </Text>
             </TouchableOpacity>
           </View>
         )}

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Text,
@@ -23,31 +23,32 @@ const PdfInput = ({navigation}: {navigation: any}) => {
   const pdfValue = async () => {
     try {
       const localStored = await AsyncStorage.getItem('pdfData');
-
       const parsedPdfData: pdfDataType[] = localStored
         ? JSON.parse(localStored)
         : [];
-
+  
       const newPdfData: pdfDataType = {
         title: text,
         pdfUrl: pdfUrl,
         id: uuid.v4(),
       };
-
+  
       const updatedPdfData = [...parsedPdfData, newPdfData];
-
+  
+      console.log('Updated Pdf Data:', updatedPdfData);
+  
       await AsyncStorage.setItem('pdfData', JSON.stringify(updatedPdfData));
-
+  
       setPdfData(updatedPdfData);
+  
       Alert.alert('Pdf Successfully Saved');
       setText('');
       setPdfUrl('');
-      navigation.navigate('PdfList');
     } catch (error) {
-      console.log(error);
+      console.log('Error saving PDF data:', error);
     }
   };
-
+  
   const pdfListPage = () => {
     navigation.navigate('PdfList');
   };
@@ -89,7 +90,11 @@ const PdfInput = ({navigation}: {navigation: any}) => {
           <Text style={styles.saveBtn}>View All Pdf</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.saveBtnContainer, styles.viewbtn]}>
+        <TouchableOpacity
+          style={[styles.saveBtnContainer, styles.viewbtn]}
+          onPress={() => {
+            navigation.navigate('PdfDownload');
+          }}>
           <Text style={styles.saveBtn}>View Downloaded Pdf</Text>
         </TouchableOpacity>
       </View>
